@@ -667,7 +667,7 @@ public class VariableString implements Expression<String> {
 	public String[] getAll(Event e) {
 		return new String[] {toString(e)};
 	}
-	
+
 	@Override
 	public boolean isSingle() {
 		return true;
@@ -702,7 +702,12 @@ public class VariableString implements Expression<String> {
 	public Class<?>[] acceptChange(ChangeMode mode) {
 		return null;
 	}
-	
+
+	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return false;
+	}
+
 	@Override
 	public void change(Event e, @Nullable Object[] delta, ChangeMode mode) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();

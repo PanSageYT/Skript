@@ -223,6 +223,11 @@ public class ExpressionList<T> implements Expression<T> {
 	}
 
 	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return false;
+	}
+
+	@Override
 	public void change(Event e, @Nullable Object[] delta, ChangeMode mode) throws UnsupportedOperationException {
 		for (Expression<?> expr : expressions) {
 			expr.change(e, delta, mode);

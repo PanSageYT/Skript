@@ -316,7 +316,12 @@ public class UnparsedLiteral implements Literal<Object> {
 	public Class<?>[] acceptChange(final ChangeMode mode) {
 		throw invalidAccessException();
 	}
-	
+
+	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return false;
+	}
+
 	@Override
 	public boolean check(final Event e, final Checker<? super Object> c) {
 		throw invalidAccessException();

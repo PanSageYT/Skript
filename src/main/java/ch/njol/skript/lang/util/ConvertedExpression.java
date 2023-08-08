@@ -138,7 +138,12 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 		}
 		return r;
 	}
-	
+
+	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return false;
+	}
+
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
 		final ClassInfo<? super T> rti = returnTypeInfo;
@@ -169,7 +174,7 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 	public T[] getAll(final Event e) {
 		return Converters.convert(source.getAll(e), to, conv);
 	}
-	
+
 	@Override
 	public boolean check(final Event e, final Checker<? super T> c, final boolean negated) {
 		return negated ^ check(e, c);

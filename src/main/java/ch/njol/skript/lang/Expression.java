@@ -41,17 +41,9 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Checker;
-import org.bukkit.event.Event;
-import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Optional;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Represents an expression. Expressions are used within conditions, effects and other expressions.
@@ -111,7 +103,25 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	 * @return An array of all possible values of this expression for the given event which must neither be null nor contain nulls, and which must not be an internal array.
 	 */
 	public T[] getAll(final Event e);
-	
+
+	/**
+	 * Get all the indexed values of this expression.
+	 * The returned array is empty if this expression doesn't have any values for the given event.
+	 *
+	 * @see IndexedValue
+	 * @see Expression#supportsIndices(ChangeMode)
+	 * @param event The event
+	 * @return An array of indexed values of this expression which must neither be null nor contain nulls.
+	 */
+	@SuppressWarnings("unchecked")
+	default public IndexedValue<T>[] getIndexed(Event event) {
+		T[] array = getArray(event);
+		IndexedValue<T>[] indexed = new IndexedValue[array.length];
+		for (int i = 0; i < array.length; i++)
+			indexed[i] = new IndexedValue<>(null, array[i]);
+		return indexed;
+	}
+
 	/**
 	 * Gets a non-null stream of this expression's values.
 	 *
@@ -303,6 +313,14 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 		}
 		return map;
 	}
+
+	/**
+	 * Returns whether the changer supports indices.
+	 * <br><b>If this is true then the delta array will be of type {@link IndexedValue}</b>
+	 * @param mode
+	 * @return if the changer supports indices
+	 */
+	public boolean supportsIndices(ChangeMode mode);
 	
 	/**
 	 * Changes the expression's value by the given amount. This will only be called on supported modes and with the desired <code>delta</code> type as returned by

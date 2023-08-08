@@ -497,11 +497,22 @@ public class Variable<T> implements Expression<T> {
 		Variables.setVariable("" + name.toString(e), value, e, local);
 	}
 
-	private void setIndex(Event e, String index, @Nullable Object value) {
+	private void setIndex(Event event, String index, @Nullable Object value) {
 		assert list;
-		String s = name.toString(e);
+		if (value instanceof Object[]) {
+			int i = 1;
+			for (Object object : ((Object[]) value))
+				setIndex(event, index + SEPARATOR + (i++ + ""), object);
+			return;
+		}
+		if (value instanceof IndexedValue) {
+			IndexedValue<?> indexedValue = (IndexedValue<?>) value;
+			setIndex(event, indexedValue.hasIndex() ? indexedValue.getIndex() : index, indexedValue.getValue());
+			return;
+		}
+		String s = name.toString(event);
 		assert s.endsWith("::*") : s + "; " + name;
-		Variables.setVariable(s.substring(0, s.length() - 1) + index, value, e, local);
+		Variables.setVariable(s.substring(0, s.length() - 1) + index, value, event, local);
 	}
 
 	@Override
@@ -509,6 +520,11 @@ public class Variable<T> implements Expression<T> {
 		if (!list && mode == ChangeMode.SET)
 			return CollectionUtils.array(Object.class);
 		return CollectionUtils.array(Object[].class);
+	}
+
+	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return list && mode == ChangeMode.SET;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -540,14 +556,7 @@ public class Variable<T> implements Expression<T> {
 					set(e, null);
 					int i = 1;
 					for (Object d : delta) {
-						if (d instanceof Object[]) {
-							for (int j = 0; j < ((Object[]) d).length; j++) {
-								setIndex(e, "" + i + SEPARATOR + j, ((Object[]) d)[j]);
-							}
-						} else {
-							setIndex(e, "" + i, d);
-						}
-						i++;
+						setIndex(e, "" + i++, d);
 					}
 				} else {
 					set(e, delta[0]);
@@ -716,6 +725,20 @@ public class Variable<T> implements Expression<T> {
 		T[] one = (T[]) Array.newInstance(superType, 1);
 		one[0] = o;
 		return one;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public IndexedValue<T>[] getIndexed(Event event) {
+		Object raw = getRaw(event);
+		if (raw == null)
+			return null;
+		if (!list)
+			return new IndexedValue[] {new IndexedValue<>(null, raw)};
+		return ((Map<String, T>) raw).entrySet()
+			.stream()
+			.map(IndexedValue::new)
+			.toArray(IndexedValue[]::new);
 	}
 
 	@Override

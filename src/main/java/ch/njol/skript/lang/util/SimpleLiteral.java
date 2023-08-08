@@ -189,7 +189,12 @@ public class SimpleLiteral<T> implements Literal<T>, DefaultExpression<T> {
 		final Changer<? super T> c = rti.getChanger();
 		return c == null ? null : c.acceptChange(mode);
 	}
-	
+
+	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return false;
+	}
+
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) throws UnsupportedOperationException {
 		final ClassInfo<? super T> rti = returnTypeInfo;

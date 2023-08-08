@@ -268,16 +268,17 @@ public class EffChange extends Effect {
 	}
 	
 	@Override
-	protected void execute(Event e) {
-		Object[] delta = changer == null ? null : changer.getArray(e);
+	protected void execute(Event event) {
+		Object[] delta = changer == null ? null :
+			changer.supportsIndices(mode) ? changer.getIndexed(event) : changer.getArray(event);
 		delta = changer == null ? delta : changer.beforeChange(changed, delta);
 
 		if ((delta == null || delta.length == 0) && (mode != ChangeMode.DELETE && mode != ChangeMode.RESET)) {
 			if (mode == ChangeMode.SET && changed.acceptChange(ChangeMode.DELETE) != null)
-				changed.change(e, null, ChangeMode.DELETE);
+				changed.change(event, null, ChangeMode.DELETE);
 			return;
 		}
-		changed.change(e, delta, mode);
+		changed.change(event, delta, mode);
 	}
 	
 	@Override

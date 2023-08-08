@@ -229,7 +229,12 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 			return null;
 		return c.acceptChange(mode);
 	}
-	
+
+	@Override
+	public boolean supportsIndices(ChangeMode mode) {
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
