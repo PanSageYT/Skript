@@ -103,7 +103,7 @@ public class ExprNamed extends PropertyExpression<Object, Object> {
 			public Object get(Object object) {
 				if (object instanceof InventoryType) {
 					try {
-						return Bukkit.createInventory(null, (InventoryType) object);
+						return Bukkit.createInventory(null, (InventoryType) object, name);
 					} catch (NullPointerException | IllegalArgumentException e) {
 						// Spigot forgot to label some InventoryType's as non creatable in some versions < 1.19.4
 						// So this throws NullPointerException aswell ontop of the IllegalArgumentException.
